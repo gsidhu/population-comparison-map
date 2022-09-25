@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Population Comparison Map | Special Dispatch</title>
+  <meta name="title" content="Population Comparison Map" />
+  <meta name="description" content="Visualising how populous countries and some states really are." />
+  <meta name="keywords" content="population, map, india, leaflet" />
+
+  <meta property="og:title" content="Population Comparison Map" />
+  <meta property="og:description" content="Visualising how populous countries and some states really are." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://thosemaps.com/population-comparison/" />
+
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Population Comparison Map"/>
+  <meta property="twitter:url" content="https://thosemaps.com/population-comparison/">
+  <meta name="twitter:description" content="Visualising how populous countries and some states really are."/>
+
+  <meta itemprop="name" content="Population Comparison Map">
+  <meta itemprop="description" content="Visualising how populous countries and some states really are.">
+  <meta itemprop="keywords" content="population, map, india, leaflet" />
+
+  <!-- Goatcounter -->
+  <script data-goatcounter="https://thosemaps.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  
+  <meta itemprop="image" content="https://thosemaps.com/population-comparison/population-comparison-image.png" />
+  <meta property="og:image" content="https://thosemaps.com/population-comparison/population-comparison-image.png" />
+  <meta name="twitter:image" content="https://thosemaps.com/population-comparison/population-comparison-image.png" />
+  <meta name="twitter:image:src" content="https://thosemaps.com/population-comparison/population-comparison-image.png" /> 
+  
+  <meta name="author" content="Gurjot." />
+  <meta name="author-website" content="https://thatgurjot.com" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js" integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s=" crossorigin=""></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+    header, footer {
+      z-index: 10;
+      color: #f5f5f5;
+    }
+		.leaflet-container {
+      margin: auto;
+			height: 100%;
+			width: 100%;
+      z-index: 9;
+			max-width: 100%;
+			max-height: 100%;
+		}
+    .f {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* height: 50px; */
+      line-height: 30px;
+    }
+    .info-box {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+    .info-box h4 {
+      margin: 0 0 5px;
+      color: #777;
+    }
+    .legend {
+      line-height: 18px;
+      color: #555;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+    .leaflet-bottom {
+      bottom: 150px;
+    }
+    /* .leaflet-control-attribution {
+      bottom: -40px;
+    } */
+    .footer-info {
+      padding: .1rem !important;
+    }
+	</style>
+
+	
+</head>
+<body>
+<!-- Header -->
+<header>
+    <div class="navbar navbar-dark bg-dark shadow-sm d-flex justify-content-center align-items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-compass" viewBox="0 0 16 16">
+        <path d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zm6.5-7.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+        <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z"/>
+      </svg>
+      <span class="ms-2"><strong>Population Comparison Map</strong></span>
+  </div>
+</header>
+
+<div id='map'></div>
+
+<!-- Footer -->
+<footer class="f bg-dark p-2">
+  <div class="text-center">
+    <p class="mb-0" id="footer-info"></p>
+  </div>
+</footer>
+
+<script type="text/javascript" src="./maps/world-indian-us-states.js"></script>
+<script type="text/javascript" src="./data/population.js"></script>
+<script type="text/javascript" src="./data/countries-ranks.js"></script>
+<script type="text/javascript" src="./data/states-ranks.js"></script>
+
+<script type="text/javascript">
+  let selectedState = "Uttar Pradesh"
+
+	var map = L.map('map').setView([35, 00], 2);
+
+	var tiles = L.tileLayer('256-water.png', {
+		zoom: 2,
+    minZoom: 2,
+    maxZoom: 6,
+		attribution: "Viz: <a href='https://thosemaps.com' target='_blank'>Those Maps</a> | Source: <a href='#' onclick='sourceClick()'>Wikipedia</a>",
+	}).addTo(map);
+
+  // console.log(map.getBounds());
+  // set automatic limits
+  // map.setMaxBounds(map.getBounds());
+  // set manually to desktop limits
+  map.setMaxBounds([
+      [84.160849,171.9140625],
+      [-68.784143, -171.9140625]
+    ]);
+
+  function getColor(d) {
+    let population = entityPopulation[d]
+    let color
+    if (population === "NA") {
+      color = 'gainsboro'
+    } else if (population > entityPopulation[selectedState]) {
+      color = '#e5f5f9'
+    } else if (population === entityPopulation[selectedState]) {
+      color = '#fa9fb5'
+    } else {
+      color = '#2ca25f'
+    }
+    return color
+  }
+
+  function style(feature) {
+      return {
+          fillColor: getColor(feature.properties.admin),
+          weight: 1,
+          opacity: 1,
+          color: 'white',
+          dashArray: '2',
+          fillOpacity: 0.7
+      };
+  }
+
+  // Show popup on hover 
+  var info = L.control({position:'topright'});
+
+  info.onAdd = function (map) {
+      this._div = L.DomUtil.create('div', 'info-box'); // create a div with a class "info"
+      this.update();
+      return this._div;
+  };
+
+  // method that we will use to update the control based on feature properties passed
+  var generalInfo = '<strong>Click or hover on a country.</strong>'
+  info.update = function (props) {
+      // translation: if props, show district name + (if sub-district name, show that | nothing) | show click on tile
+      if (!props) {
+      this._div.innerHTML = generalInfo
+      } else {
+        this._div.innerHTML = "<h5>" + props.admin + "</h5>Population: " + entityPopulation[props.admin].toLocaleString("en-US")
+      }
+  }
+
+  info.addTo(map);
+      
+  // Make it interactive 
+  var selection = null; // currently selected feature; if null, resets interactive elements (happens when user clicks outside map)
+
+  function colorItUp(e) {
+    // update selected state
+    selectedState = e.target.feature.properties.admin
+    // update feature colours
+    geojson.resetStyle();
+    // update legend
+    document.getElementsByClassName('legend')[0].innerHTML = legendDiv()
+    // update footer info
+    footerDiv()
+    
+  }
+  function highlightFeature(e) {
+      selection = e;
+      var layer = e.target;
+
+      layer.setStyle({
+          weight: 3,
+          color: '#666',
+          dashArray: '',
+          fillOpacity: 0.7
+      });
+
+      info.update(layer.feature.properties);
+  }
+  function resetHighlight(e) {
+      // on mobile, reset all (previous) styles when called by zoomToFeature
+      if (e != 0) {
+          geojson.resetStyle();
+      } else {
+        geojson.resetStyle(e.target);
+      }
+      info.update();
+  }
+  function onEachFeature(feature, layer) {
+      layer.on({
+          mouseover: highlightFeature,
+          mouseout: resetHighlight,
+          click: colorItUp
+      });
+  }
+
+  function legendDiv() {
+    let div = '<h6>Population Comparison</h6>'
+    if (entityPopulation[selectedState] != "NA") {
+      div += '<i style="background:#fa9fb5"></i> – ' + selectedState + " (" + (entityPopulation[selectedState].toLocaleString("en-US")) + ')<br/>'
+      div += '<i style="background:#e5f5f9"></i> – More than ' + selectedState + '<br/>'
+      div += '<i style="background:#2ca25f"></i> – Less than ' + selectedState + '<br/>'
+      div += '<i style="background:gainsboro"></i> – NA<br/>'
+    } else {
+      div = "Data unavailable for " + selectedState
+    }
+    return div
+  }
+
+  var legend = L.control({position: 'bottomright'});
+  legend.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info-box legend')
+      div.innerHTML = legendDiv()
+      return div;
+  };
+
+  legend.addTo(map);
+  
+  geojson = L.geoJson(geoWorldMap, {
+    style: style,
+    onEachFeature: onEachFeature
+  }).addTo(map);
+
+  // set footer info
+  function footerDiv() {
+    let footerInfo = ''
+    if (entityPopulation[selectedState] != "NA") {
+      // if it's in the country ranks dict, it's a country
+      if (Object.keys(countryRanks).indexOf(selectedState) > -1) {
+        let lessCountries = 245 - countryRanks[selectedState]
+        let percentage = 100*lessCountries/245
+        footerInfo = selectedState + " is the #" + countryRanks[selectedState] + " most populated country in the world. " + (percentage).toFixed(1) + "% of the world's countries have a smaller population than " + selectedState + "."
+      } else {
+        // otherwise it's a state
+        footerInfo = "The state of " + selectedState + " would rank as the #" + stateRanks[selectedState][0] + " most populated country in the world. " + (stateRanks[selectedState][1]).toFixed(1) + "% of the world's countries have a smaller population than " + selectedState + "."
+      }
+    } else {
+      footerInfo = "Data unavailable for " + selectedState
+    }
+    document.getElementById('footer-info').textContent = footerInfo
+  }
+
+  // initial call
+  footerDiv()
+
+  function sourceClick() {
+    let div = '<h5>Sources</h5>'
+    div += '<a href="https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)" target="_blank">World Population</a><br/>'
+    div += '<a href="https://en.wikipedia.org/wiki/List_of_states_and_union_territories_of_India_by_population" target="_blank">India Population</a><br/>'
+    div += '<a href="https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_population" target="_blank">USA Population</a>'
+    document.getElementsByClassName('legend')[0].innerHTML = div
+  }
+</script>
+</body>
+</html>
