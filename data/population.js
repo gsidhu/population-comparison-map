@@ -262,7 +262,7 @@ var entityPopulation = {
   "Punjab": 27743338,
   "Chhattisgarh": 25545198,
   "Haryana": 25351462,
-  "NCT of Delhi": 16787941,
+  "Delhi": 16787941,
   "Jammu and Kashmir": 12267032,
   "Uttarakhand": 10086292,
   "Himachal Pradesh": 6864602,

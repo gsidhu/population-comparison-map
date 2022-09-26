@@ -49,7 +49,7 @@ var stateRanks = {
   'Missouri': [112, 54.47],
   'Mizoram': [156, 36.59],
   'Montana': [156, 36.59],
-  'NCT of Delhi': [69, 71.95],
+  'Delhi': [69, 71.95],
   'Nagaland': [148, 39.84],
   'Nebraska': [148, 39.84],
   'Nevada': [136, 44.72],
